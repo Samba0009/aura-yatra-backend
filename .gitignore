@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files
+backend/.env
+website/.env
+app/.env
+
+# Dependencies
+node_modules/
