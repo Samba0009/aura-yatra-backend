@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { initializeFCM } from './firebase_native';
 import Splash from './screens/Splash';
 import Home from './screens/Home';
 import TempleSearch from './screens/TempleSearch';
@@ -25,7 +26,12 @@ import Profile from './screens/Profile';
 
 const AppContent = () => {
   const location = useLocation();
-  
+
+  useEffect(() => {
+    // Initialize FCM on app load for Native Android
+    initializeFCM();
+  }, []);
+
   return (
     <AppLayout>
       <Routes>
