@@ -4,6 +4,6 @@
   "scripts": {
     "website:dev": "cd website && npm run dev",
     "backend:dev": "cd backend && node index.js",
-    "app:android": "cd website && npm run build && npx cap sync android && npx cap open android"
+    "app:android": "cd website && npm run build && npm exec -- cap sync android --config ../app/capacitor.config.json && npm exec -- cap open android --config ../app/capacitor.config.json"
   }
 }

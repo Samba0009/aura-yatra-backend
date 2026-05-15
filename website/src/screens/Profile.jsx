@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { IconGear, IconClock, IconHelp, IconLogout, IconMail, IconShieldCheck } from '@tabler/icons-react';
+import { IconSettingsCog, IconClock, IconHelp, IconLogout, IconMail, IconShieldCheck } from '@tabler/icons-react';
 import SignIn from './SignIn';
 
 const Profile = () => {
@@ -41,7 +41,7 @@ const Profile = () => {
         {/* Account Settings */}
         <button className="w-full bg-surfaceElevated border border-borderDefault rounded-[16px] p-4 flex items-center gap-3 hover:bg-white/5 transition-colors group">
           <div className="w-10 h-10 rounded-full bg-accentPurple/20 flex items-center justify-center group-hover:bg-accentPurple/30 transition-colors">
-            <IconGear size={20} className="text-accentPurple" />
+            <IconSettingsCog size={20} className="text-accentPurple" />
           </div>
           <div className="text-left flex-1">
             <p className="text-textPrimary font-medium text-[14px]">Account Settings</p>

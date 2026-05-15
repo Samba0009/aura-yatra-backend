@@ -1,5 +1,6 @@
 {
   "appId": "com.aurayatra.app",
   "appName": "AuraYatra",
-  "webDir": "dist"
+  "webDir": "../website/dist",
+  "bundledWebRuntime": false
 }
