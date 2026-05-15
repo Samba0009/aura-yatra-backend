@@ -1,50 +1,107 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { IconUserCircle, IconLogout, IconMail, IconShieldCheck } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
+import { IconGear, IconClock, IconHelp, IconLogout, IconMail, IconShieldCheck } from '@tabler/icons-react';
 import SignIn from './SignIn';
 
 const Profile = () => {
   const { currentUser, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
 
   if (!currentUser) {
     return <SignIn />;
   }
 
+  const handleLogout = () => {
+    logout();
+    navigate('/signin');
+  };
+
   return (
-    <div className="h-full bg-bgBase flex flex-col p-6 max-w-lg mx-auto w-full">
-      <div className="mt-8 mb-10 text-center">
-        <h2 className="font-serif text-[26px] text-textPrimary leading-none mb-2">My Profile</h2>
-        <p className="text-accentPurple text-[10px] tracking-[0.15em] uppercase font-medium">Aura Yatra Account</p>
-      </div>
-
-      <div className="bg-surfaceElevated border border-borderDefault rounded-[16px] p-6 mb-6 shadow-md flex flex-col items-center">
-        <div className="w-20 h-20 rounded-full bg-accentPurpleDeep flex items-center justify-center text-textPrimary mb-4">
-          <IconUserCircle size={48} stroke={1} />
-        </div>
-        <h3 className="text-[18px] text-white font-medium mb-1">
-          {currentUser.displayName || 'Devotee'}
-        </h3>
-        <div className="flex items-center gap-2 text-textMuted text-[13px] mb-4">
-          <IconMail size={16} />
-          {currentUser.email}
-        </div>
-
-        {isAdmin && (
-          <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-[11px] font-medium">
-            <IconShieldCheck size={14} />
-            Administrator
+    <div className="min-h-full bg-bgBase flex flex-col pb-[100px]">
+      {/* Profile Header */}
+      <div className="px-6 py-8">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-16 h-16 rounded-full bg-accentPurpleDeep flex items-center justify-center flex-shrink-0">
+            <span className="text-2xl font-serif text-white">
+              {currentUser.displayName?.charAt(0) || 'S'}
+            </span>
           </div>
-        )}
+          <div className="flex-1">
+            <h1 className="font-serif text-[24px] text-textPrimary font-semibold mb-1">
+              My Profile
+            </h1>
+            <p className="text-textMuted text-[13px]">{currentUser.email}</p>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-3 mt-auto mb-10">
-        <button 
-          onClick={logout}
-          className="w-full py-4 rounded-[14px] border border-borderDefault bg-surface text-textPrimary font-medium text-[14px] flex items-center justify-center gap-2 hover:bg-white/5 transition-colors"
-        >
-          <IconLogout size={18} className="text-red-400" />
-          Sign Out
+      {/* Menu Items */}
+      <div className="px-6 space-y-3">
+        {/* Account Settings */}
+        <button className="w-full bg-surfaceElevated border border-borderDefault rounded-[16px] p-4 flex items-center gap-3 hover:bg-white/5 transition-colors group">
+          <div className="w-10 h-10 rounded-full bg-accentPurple/20 flex items-center justify-center group-hover:bg-accentPurple/30 transition-colors">
+            <IconGear size={20} className="text-accentPurple" />
+          </div>
+          <div className="text-left flex-1">
+            <p className="text-textPrimary font-medium text-[14px]">Account Settings</p>
+            <p className="text-textMuted text-[12px]">Manage your account</p>
+          </div>
         </button>
+
+        {/* Booking History */}
+        <button 
+          onClick={() => navigate('/trips')}
+          className="w-full bg-surfaceElevated border border-borderDefault rounded-[16px] p-4 flex items-center gap-3 hover:bg-white/5 transition-colors group"
+        >
+          <div className="w-10 h-10 rounded-full bg-accentPurple/20 flex items-center justify-center group-hover:bg-accentPurple/30 transition-colors">
+            <IconClock size={20} className="text-accentPurple" />
+          </div>
+          <div className="text-left flex-1">
+            <p className="text-textPrimary font-medium text-[14px]">Booking History</p>
+            <p className="text-textMuted text-[12px]">View past trips</p>
+          </div>
+        </button>
+
+        {/* Support & Help */}
+        <button className="w-full bg-surfaceElevated border border-borderDefault rounded-[16px] p-4 flex items-center gap-3 hover:bg-white/5 transition-colors group">
+          <div className="w-10 h-10 rounded-full bg-accentPurple/20 flex items-center justify-center group-hover:bg-accentPurple/30 transition-colors">
+            <IconHelp size={20} className="text-accentPurple" />
+          </div>
+          <div className="text-left flex-1">
+            <p className="text-textPrimary font-medium text-[14px]">Support & Help</p>
+            <p className="text-textMuted text-[12px]">Get assistance</p>
+          </div>
+        </button>
+      </div>
+
+      {/* Admin Badge */}
+      {isAdmin && (
+        <div className="px-6 mt-6">
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-[16px] p-4 flex items-center gap-3">
+            <IconShieldCheck size={20} className="text-emerald-400" />
+            <div>
+              <p className="text-emerald-400 font-semibold text-[13px]">Administrator</p>
+              <p className="text-emerald-400/70 text-[11px]">You have admin access</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Logout */}
+      <div className="px-6 mt-auto">
+        <button 
+          onClick={handleLogout}
+          className="w-full bg-red-500/10 border border-red-500/30 rounded-[16px] p-4 flex items-center gap-3 hover:bg-red-500/20 transition-colors"
+        >
+          <IconLogout size={20} className="text-red-400" />
+          <span className="text-red-400 font-semibold text-[14px]">Log Out</span>
+        </button>
+      </div>
+
+      {/* Footer */}
+      <div className="px-6 py-6 text-center">
+        <p className="text-textMuted text-[12px]">AURA YATRA V1.0.0</p>
       </div>
     </div>
   );
