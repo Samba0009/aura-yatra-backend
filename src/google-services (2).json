@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "207215788492",
+    "project_id": "aurayatra-1",
+    "storage_bucket": "aurayatra-1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207215788492:android:db611f939a2ee816c19d69",
+        "android_client_info": {
+          "package_name": "com.example.aurayatra_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "207215788492-vq5rlmu50779v6g1kul0qlulh3ktcqpn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4-tGegt0_OosvFGcGqYxcwfY2Sj98qzk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "207215788492-vq5rlmu50779v6g1kul0qlulh3ktcqpn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
