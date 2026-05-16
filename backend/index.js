@@ -116,6 +116,32 @@ app.post('/api/bookings', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// Start server after verifying DB connectivity (retry if needed)
+async function startServer() {
+  const maxTries = 6;
+  const delayMs = 3000;
+  let attempt = 0;
+
+  while (attempt < maxTries) {
+    try {
+      attempt++;
+      console.log(`DB connection test attempt ${attempt}...`);
+      // For pg Pool this will attempt a simple query
+      await db.query('SELECT 1');
+      console.log('Database connection OK. Starting server.');
+      app.listen(PORT, () => {
+        console.log(`Server running on http://0.0.0.0:${PORT}`);
+      });
+      return;
+    } catch (err) {
+      console.error(`DB connect attempt ${attempt} failed:`, err.message || err);
+      if (attempt >= maxTries) {
+        console.error('Exceeded max DB connect attempts. Exiting.');
+        process.exit(1);
+      }
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+}
+
+startServer();
