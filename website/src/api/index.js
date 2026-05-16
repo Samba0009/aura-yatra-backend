@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://192.168.1.9:5000/api';
+// Use Android emulator host for local device testing
+const API_BASE_URL = 'http://10.0.2.2:5000/api';
 
 export const fetchTemples = async (city = '') => {
   const url = city ? `${API_BASE_URL}/temples?city=${city}` : `${API_BASE_URL}/temples`;
