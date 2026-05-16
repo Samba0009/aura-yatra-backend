@@ -3,78 +3,117 @@ const cors = require('cors');
 const db = require('./db');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 
 // Routes
-app.get('/api/temples', (req, res) => {
-  const city = req.query.city;
-  if (city) {
-    const temples = db.prepare('SELECT * FROM temples WHERE city LIKE ? OR name LIKE ?').all(`%${city}%`, `%${city}%`);
-    res.json(temples);
-  } else {
-    const temples = db.prepare('SELECT * FROM temples').all();
-    res.json(temples);
+app.get('/api/temples', async (req, res) => {
+  try {
+    const city = req.query.city;
+    let result;
+    if (city) {
+      result = await db.query(
+        'SELECT * FROM temples WHERE city ILIKE $1 OR name ILIKE $2',
+        [`%${city}%`, `%${city}%`]
+      );
+    } else {
+      result = await db.query('SELECT * FROM temples');
+    }
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
   }
 });
 
-app.get('/api/plans', (req, res) => {
-  const { terrain, budget } = req.query;
-  let query = 'SELECT * FROM plans';
-  const params = [];
+app.get('/api/plans', async (req, res) => {
+  try {
+    const { terrain, budget } = req.query;
+    let query = 'SELECT * FROM plans';
+    const params = [];
+    let paramCount = 1;
 
-  if (terrain || budget) {
-    query += ' WHERE';
-    if (terrain) {
-      query += ' terrain = ?';
-      params.push(terrain);
+    if (terrain || budget) {
+      query += ' WHERE';
+      if (terrain) {
+        query += ` terrain = $${paramCount}`;
+        params.push(terrain);
+        paramCount++;
+      }
+      if (budget) {
+        if (terrain) query += ' AND';
+        query += ` budget = $${paramCount}`;
+        params.push(budget);
+      }
     }
-    if (budget) {
-      if (terrain) query += ' AND';
-      query += ' budget = ?';
-      params.push(budget);
-    }
+
+    const result = await db.query(query, params);
+    // Parse tags back to array
+    const formattedPlans = result.rows.map(p => ({ ...p, tags: p.tags.split(',') }));
+    res.json(formattedPlans);
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
   }
-
-  const plans = db.prepare(query).all(...params);
-  // Parse tags back to array
-  const formattedPlans = plans.map(p => ({ ...p, tags: p.tags.split(',') }));
-  res.json(formattedPlans);
 });
 
-app.get('/api/blogs', (req, res) => {
-  const blogs = db.prepare('SELECT * FROM blogs').all();
-  res.json(blogs);
+app.get('/api/blogs', async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM blogs');
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
 });
 
-app.get('/api/bookings', (req, res) => {
-  const bookings = db.prepare('SELECT * FROM bookings ORDER BY id DESC').all();
-  const formattedBookings = bookings.map(b => ({
-    ...b,
-    user_details: JSON.parse(b.user_details)
-  }));
-  res.json(formattedBookings);
+app.get('/api/bookings', async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM bookings ORDER BY id DESC');
+    const formattedBookings = result.rows.map(b => ({
+      ...b,
+      user_details: JSON.parse(b.user_details)
+    }));
+    res.json(formattedBookings);
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
 });
 
-app.post('/api/blogs', (req, res) => {
-  const { title, tag, description } = req.body;
-  const author = 'You'; // Default for now
-  const time = 'Just now';
-  const color = '#8A2BE2'; // Default purple
-  const likes = '0';
+app.post('/api/blogs', async (req, res) => {
+  try {
+    const { title, tag, description } = req.body;
+    const author = 'You';
+    const time = 'Just now';
+    const color = '#8A2BE2';
+    const likes = '0';
 
-  const insert = db.prepare('INSERT INTO blogs (tag, title, author, time, color, likes, description) VALUES (?, ?, ?, ?, ?, ?, ?)');
-  const info = insert.run(tag, title, author, time, color, likes, description);
-  res.status(201).json({ id: info.lastInsertRowid, status: 'Published' });
+    const result = await db.query(
+      'INSERT INTO blogs (tag, title, author, time, color, likes, description) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      [tag, title, author, time, color, likes, description]
+    );
+    res.status(201).json({ id: result.rows[0].id, status: 'Published' });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
 });
 
-app.post('/api/bookings', (req, res) => {
-  const { item_id, item_type, user_details } = req.body;
-  const insert = db.prepare('INSERT INTO bookings (item_id, item_type, user_details) VALUES (?, ?, ?)');
-  const info = insert.run(item_id, item_type, JSON.stringify(user_details));
-  res.status(201).json({ id: info.lastInsertRowid, status: 'Confirmed' });
+app.post('/api/bookings', async (req, res) => {
+  try {
+    const { item_id, item_type, user_details } = req.body;
+    const result = await db.query(
+      'INSERT INTO bookings (item_id, item_type, user_details) VALUES ($1, $2, $3) RETURNING id',
+      [item_id, item_type, JSON.stringify(user_details)]
+    );
+    res.status(201).json({ id: result.rows[0].id, status: 'Confirmed' });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
 });
 
 app.listen(PORT, () => {
