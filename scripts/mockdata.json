@@ -1,0 +1,303 @@
+{
+  "temples": [
+    {
+      "id": "t1",
+      "name": "Tirupati Balaji",
+      "location": "Andhra Pradesh",
+      "status": "active",
+      "visitors": 12400
+    },
+    {
+      "id": "t2",
+      "name": "Vaishno Devi",
+      "location": "Jammu & Kashmir",
+      "status": "active",
+      "visitors": 8900
+    },
+    {
+      "id": "t3",
+      "name": "Kedarnath",
+      "location": "Uttarakhand",
+      "status": "seasonal",
+      "visitors": 5600
+    },
+    {
+      "id": "t4",
+      "name": "Shirdi Sai Baba",
+      "location": "Maharashtra",
+      "status": "active",
+      "visitors": 9200
+    },
+    {
+      "id": "t5",
+      "name": "Somnath Temple",
+      "location": "Gujarat",
+      "status": "active",
+      "visitors": 4100
+    }
+  ],
+  "hotels": [
+    {
+      "id": "h1",
+      "name": "Yatra Residency Tirupati",
+      "location": "Tirupati",
+      "rooms": 48,
+      "price": 1800,
+      "status": "active"
+    },
+    {
+      "id": "h2",
+      "name": "Divine Stay Rishikesh",
+      "location": "Rishikesh",
+      "rooms": 32,
+      "price": 2400,
+      "status": "active"
+    },
+    {
+      "id": "h3",
+      "name": "Char Dham Guest House",
+      "location": "Haridwar",
+      "rooms": 20,
+      "price": 1200,
+      "status": "maintenance"
+    },
+    {
+      "id": "h4",
+      "name": "Shirdi Pilgrims Inn",
+      "location": "Shirdi",
+      "rooms": 60,
+      "price": 1600,
+      "status": "active"
+    }
+  ],
+  "buses": [
+    {
+      "id": "b1",
+      "route": "Hyderabad → Tirupati",
+      "seats": 40,
+      "departure": "06:00 AM",
+      "price": 650,
+      "status": "active"
+    },
+    {
+      "id": "b2",
+      "route": "Delhi → Haridwar",
+      "seats": 45,
+      "departure": "09:30 PM",
+      "price": 480,
+      "status": "active"
+    },
+    {
+      "id": "b3",
+      "route": "Mumbai → Shirdi",
+      "seats": 35,
+      "departure": "10:00 PM",
+      "price": 390,
+      "status": "active"
+    },
+    {
+      "id": "b4",
+      "route": "Chennai → Tirupati",
+      "seats": 40,
+      "departure": "11:00 PM",
+      "price": 420,
+      "status": "inactive"
+    }
+  ],
+  "cars": [
+    {
+      "id": "c1",
+      "model": "Toyota Innova",
+      "type": "SUV",
+      "seats": 7,
+      "pricePerKm": 18,
+      "status": "available"
+    },
+    {
+      "id": "c2",
+      "model": "Swift Dzire",
+      "type": "Sedan",
+      "seats": 4,
+      "pricePerKm": 12,
+      "status": "booked"
+    },
+    {
+      "id": "c3",
+      "model": "Tempo Traveller",
+      "type": "Van",
+      "seats": 12,
+      "pricePerKm": 22,
+      "status": "available"
+    },
+    {
+      "id": "c4",
+      "model": "Maruti Ertiga",
+      "type": "MPV",
+      "seats": 7,
+      "pricePerKm": 15,
+      "status": "available"
+    }
+  ],
+  "blogs": [
+    {
+      "id": "bl1",
+      "title": "Best Time to Visit Kedarnath",
+      "author": "Admin",
+      "date": "2024-03-10",
+      "status": "published",
+      "views": 3400,
+      "content": ""
+    },
+    {
+      "id": "bl2",
+      "title": "Complete Guide to Char Dham Yatra",
+      "author": "Admin",
+      "date": "2024-03-18",
+      "status": "published",
+      "views": 7800,
+      "content": ""
+    },
+    {
+      "id": "bl3",
+      "title": "Tirupati Darshan Tips 2024",
+      "author": "Admin",
+      "date": "2024-04-02",
+      "status": "draft",
+      "views": 0,
+      "content": ""
+    },
+    {
+      "id": "bl4",
+      "title": "Vaishno Devi Helicopter Booking",
+      "author": "Admin",
+      "date": "2024-04-08",
+      "status": "published",
+      "views": 5100,
+      "content": ""
+    }
+  ],
+  "users": [
+    {
+      "id": "u1",
+      "name": "Ramesh Kumar",
+      "email": "ramesh@gmail.com",
+      "joined": "2024-01-15",
+      "bookings": 4,
+      "status": "active"
+    },
+    {
+      "id": "u2",
+      "name": "Priya Sharma",
+      "email": "priya.s@yahoo.com",
+      "joined": "2024-02-03",
+      "bookings": 2,
+      "status": "active"
+    },
+    {
+      "id": "u3",
+      "name": "Ajay Verma",
+      "email": "ajay.v@gmail.com",
+      "joined": "2024-02-28",
+      "bookings": 1,
+      "status": "active"
+    },
+    {
+      "id": "u4",
+      "name": "Sunita Devi",
+      "email": "sunita@hotmail.com",
+      "joined": "2024-03-12",
+      "bookings": 6,
+      "status": "suspended"
+    },
+    {
+      "id": "u5",
+      "name": "Mohan Lal",
+      "email": "mohan.l@gmail.com",
+      "joined": "2024-03-29",
+      "bookings": 3,
+      "status": "active"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "BK001",
+      "user": "Ramesh Kumar",
+      "type": "Temple",
+      "item": "Tirupati Balaji",
+      "date": "2024-04-20",
+      "amount": 2450,
+      "status": "confirmed",
+      "phone": "9876543210"
+    },
+    {
+      "id": "BK002",
+      "user": "Priya Sharma",
+      "type": "Hotel",
+      "item": "Yatra Residency Tirupati",
+      "date": "2024-04-22",
+      "amount": 3600,
+      "status": "pending",
+      "phone": "9845012345"
+    },
+    {
+      "id": "BK003",
+      "user": "Ajay Verma",
+      "type": "Bus",
+      "item": "Hyderabad → Tirupati",
+      "date": "2024-04-25",
+      "amount": 1300,
+      "status": "confirmed",
+      "phone": "9900112233"
+    },
+    {
+      "id": "BK004",
+      "user": "Sunita Devi",
+      "type": "Car",
+      "item": "Toyota Innova",
+      "date": "2024-04-18",
+      "amount": 5400,
+      "status": "completed",
+      "phone": "9123456789"
+    },
+    {
+      "id": "BK005",
+      "user": "Mohan Lal",
+      "type": "Temple",
+      "item": "Vaishno Devi",
+      "date": "2024-05-01",
+      "amount": 1800,
+      "status": "pending",
+      "phone": "9988776655"
+    },
+    {
+      "id": "BK006",
+      "user": "Ramesh Kumar",
+      "type": "Hotel",
+      "item": "Divine Stay Rishikesh",
+      "date": "2024-05-03",
+      "amount": 4800,
+      "status": "confirmed",
+      "phone": "9876543210"
+    },
+    {
+      "id": "BK007",
+      "user": "Priya Sharma",
+      "type": "Bus",
+      "item": "Mumbai → Shirdi",
+      "date": "2024-04-30",
+      "amount": 780,
+      "status": "cancelled",
+      "phone": "9845012345"
+    },
+    {
+      "id": "BK008",
+      "user": "Mohan Lal",
+      "type": "Car",
+      "item": "Maruti Ertiga",
+      "date": "2024-05-05",
+      "amount": 3000,
+      "status": "pending",
+      "phone": "9988776655"
+    }
+  ]
+}

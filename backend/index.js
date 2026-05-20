@@ -116,6 +116,178 @@ app.post('/api/bookings', async (req, res) => {
   }
 });
 
+// Admin CRUD endpoints
+app.post('/api/temples', async (req, res) => {
+  try {
+    const { name, location, city, icon, price, description } = req.body;
+    const result = await db.query(
+      'INSERT INTO temples (name, location, city, icon, price, description) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+      [name, location, city, icon, price, description]
+    );
+    res.status(201).json({ id: result.rows[0].id });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.put('/api/temples/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, location, city, icon, price, description } = req.body;
+    await db.query(
+      'UPDATE temples SET name=$1, location=$2, city=$3, icon=$4, price=$5, description=$6 WHERE id=$7',
+      [name, location, city, icon, price, description, id]
+    );
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.delete('/api/temples/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query('DELETE FROM temples WHERE id=$1', [id]);
+    res.json({ status: 'deleted' });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.post('/api/plans', async (req, res) => {
+  try {
+    const { name, description, terrain, budget, tags = [], image_url } = req.body;
+    const tagsStr = Array.isArray(tags) ? tags.join(',') : (tags || '');
+    const result = await db.query(
+      'INSERT INTO plans (name, description, terrain, budget, tags, image_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+      [name, description, terrain, budget, tagsStr, image_url]
+    );
+    res.status(201).json({ id: result.rows[0].id });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.put('/api/plans/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, terrain, budget, tags = [], image_url } = req.body;
+    const tagsStr = Array.isArray(tags) ? tags.join(',') : (tags || '');
+    await db.query(
+      'UPDATE plans SET name=$1, description=$2, terrain=$3, budget=$4, tags=$5, image_url=$6 WHERE id=$7',
+      [name, description, terrain, budget, tagsStr, image_url, id]
+    );
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.delete('/api/plans/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query('DELETE FROM plans WHERE id=$1', [id]);
+    res.json({ status: 'deleted' });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.put('/api/blogs/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { tag, title, author, time, color, likes, description } = req.body;
+    await db.query(
+      'UPDATE blogs SET tag=$1, title=$2, author=$3, time=$4, color=$5, likes=$6, description=$7 WHERE id=$8',
+      [tag, title, author, time, color, likes, description, id]
+    );
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.delete('/api/blogs/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query('DELETE FROM blogs WHERE id=$1', [id]);
+    res.json({ status: 'deleted' });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.put('/api/bookings/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { item_id, item_type, user_details } = req.body;
+    await db.query(
+      'UPDATE bookings SET item_id=$1, item_type=$2, user_details=$3 WHERE id=$4',
+      [item_id, item_type, JSON.stringify(user_details), id]
+    );
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.delete('/api/bookings/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query('DELETE FROM bookings WHERE id=$1', [id]);
+    res.json({ status: 'deleted' });
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// Seed endpoint: accepts JSON with arrays for temples, plans, blogs, bookings
+app.post('/api/seed', async (req, res) => {
+  try {
+    const payload = req.body || {};
+    // Insert temples
+    if (Array.isArray(payload.temples)) {
+      for (const t of payload.temples) {
+        await db.query('INSERT INTO temples (name, location, city, icon, price, description) VALUES ($1,$2,$3,$4,$5,$6)', [t.name, t.location || '', t.city || '', t.icon || '', t.price || 0, t.description || '']);
+      }
+    }
+    // Insert plans
+    if (Array.isArray(payload.plans)) {
+      for (const p of payload.plans) {
+        const tags = Array.isArray(p.tags) ? p.tags.join(',') : (p.tags || '');
+        await db.query('INSERT INTO plans (name, description, terrain, budget, tags, image_url) VALUES ($1,$2,$3,$4,$5,$6)', [p.name, p.description || '', p.terrain || '', p.budget || '', tags, p.image_url || '']);
+      }
+    }
+    // Insert blogs
+    if (Array.isArray(payload.blogs)) {
+      for (const b of payload.blogs) {
+        await db.query('INSERT INTO blogs (tag, title, author, time, color, likes, description) VALUES ($1,$2,$3,$4,$5,$6,$7)', [b.tag || '', b.title || '', b.author || 'Admin', b.time || '', b.color || '#8A2BE2', b.likes || '0', b.content || b.description || '']);
+      }
+    }
+    // Insert bookings
+    if (Array.isArray(payload.bookings)) {
+      for (const bk of payload.bookings) {
+        await db.query('INSERT INTO bookings (item_id, item_type, user_details) VALUES ($1,$2,$3)', [bk.item_id || 0, bk.item_type || 'temple', JSON.stringify(bk.user_details || {})]);
+      }
+    }
+
+    res.json({ status: 'seeded' });
+  } catch (err) {
+    console.error('Seed error:', err);
+    res.status(500).json({ error: 'Seed failed' });
+  }
+});
+
 // Start server after verifying DB connectivity (retry if needed)
 async function startServer() {
   const maxTries = 6;

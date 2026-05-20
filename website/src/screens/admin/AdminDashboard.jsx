@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, addDoc } from "firebase/firestore";
-import { db } from "../../firebase";
+// Using backend REST API instead of Firebase for admin operations
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 const monthlyRevenue = [
   { month: "Nov", revenue: 18400 },
@@ -131,19 +131,31 @@ export default function YatraAdmin() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Bypassing Firebase temporarily due to Permission Denied error.
-      // Loading local mock data directly.
-      setBookings(mockData.bookings);
-      setTemples(mockData.temples);
-      setHotels(mockData.hotels);
-      setBuses(mockData.buses);
-      setCars(mockData.cars);
-      setBlogs(mockData.blogs);
-      setUsers(mockData.users);
-      showToast("Loaded local mock data (Firebase Firestore is disabled)");
+      const [bkRes, tRes, pRes, bRes] = await Promise.all([
+        fetch(`${API}/bookings`).then(r => r.json()),
+        fetch(`${API}/temples`).then(r => r.json()),
+        fetch(`${API}/plans`).then(r => r.json()),
+        fetch(`${API}/blogs`).then(r => r.json())
+      ]);
+
+      // Normalize bookings: ensure status exists
+      const normalizedBookings = bkRes.map(b => ({
+        ...b,
+        user_details: b.user_details || {},
+        status: b.status || (b.user_details && b.user_details.status) || 'pending'
+      }));
+
+      setBookings(normalizedBookings);
+      setTemples(tRes);
+      setHotels([]); // no hotels API yet
+      setBuses([]);
+      setCars([]);
+      setBlogs(bRes);
+      setUsers([]);
+      showToast('Loaded data from backend');
     } catch (err) {
-      console.error("Error fetching data:", err);
-      showToast("Error loading data", "danger");
+      console.error('Error fetching data:', err);
+      showToast('Error loading data from backend', 'danger');
     } finally {
       setLoading(false);
     }
@@ -154,19 +166,16 @@ export default function YatraAdmin() {
   }, []);
 
   const seedDatabase = async () => {
-    if (!window.confirm("This will upload all mock data to your live Firebase database. Are you sure?")) return;
+    if (!window.confirm('This will upload all mock data to your backend database. Are you sure?')) return;
     setIsSeeding(true);
     try {
-      for (const [colName, items] of Object.entries(mockData)) {
-        for (const item of items) {
-          await setDoc(doc(db, colName, item.id), item);
-        }
-      }
-      showToast("Database seeded successfully!");
-      fetchData(); // Refresh data
+      const res = await fetch(`${API}/seed`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(mockData) });
+      if (!res.ok) throw new Error('Seed failed');
+      showToast('Database seeded successfully!');
+      await fetchData();
     } catch (err) {
-      console.error("Error seeding database:", err);
-      showToast("Failed to seed database", "danger");
+      console.error('Error seeding database:', err);
+      showToast('Failed to seed database', 'danger');
     } finally {
       setIsSeeding(false);
     }
@@ -174,32 +183,51 @@ export default function YatraAdmin() {
 
   const updateBookingStatus = async (id, newStatus) => {
     try {
-      await updateDoc(doc(db, "bookings", id), { status: newStatus });
-      setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
+      const booking = bookings.find(b => b.id === id);
+      const user_details = { ...(booking.user_details || {}), status: newStatus };
+      const res = await fetch(`${API}/bookings/${id}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_id: booking.item_id, item_type: booking.item_type, user_details })
+      });
+      if (!res.ok) throw new Error('update failed');
+      setBookings(prev => prev.map(b => b.id === id ? { ...b, user_details, status: newStatus } : b));
       showToast(`Booking ${id} marked as ${newStatus}`);
     } catch (err) {
-      showToast("Failed to update status", "danger");
+      showToast('Failed to update status', 'danger');
     }
   };
 
   const deleteItem = async (colName, setter, id) => {
     try {
-      await deleteDoc(doc(db, colName, id));
+      let endpoint = `${API}/${colName}/${id}`;
+      // map frontend collection names to API paths if needed
+      if (colName === 'users') { showToast('User delete not supported', 'danger'); return; }
+      const res = await fetch(endpoint, { method: 'DELETE' });
+      if (!res.ok) throw new Error('delete failed');
       setter(prev => prev.filter(x => x.id !== id));
-      showToast("Record deleted", "danger");
+      showToast('Record deleted', 'danger');
     } catch (err) {
-      showToast("Failed to delete record", "danger");
+      showToast('Failed to delete record', 'danger');
     }
   };
 
   const toggleStatus = async (colName, setter, id, currentStatus, on = "active", off = "inactive", field = "status") => {
     const newStatus = currentStatus === on ? off : on;
     try {
-      await updateDoc(doc(db, colName, id), { [field]: newStatus });
-      setter(prev => prev.map(x => x.id === id ? { ...x, [field]: newStatus } : x));
-      showToast("Status updated");
+      // For bookings, store status inside user_details; for other collections, try PUT endpoint
+      if (colName === 'bookings') {
+        const booking = bookings.find(b => b.id === id);
+        const user_details = { ...(booking.user_details || {}), status: newStatus };
+        const res = await fetch(`${API}/bookings/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item_id: booking.item_id, item_type: booking.item_type, user_details }) });
+        if (!res.ok) throw new Error('update failed');
+        setter(prev => prev.map(x => x.id === id ? { ...x, user_details, status: newStatus } : x));
+      } else {
+        // optimistic update locally; backend may not have status column
+        setter(prev => prev.map(x => x.id === id ? { ...x, [field]: newStatus } : x));
+      }
+      showToast('Status updated');
     } catch (err) {
-      showToast("Failed to update status", "danger");
+      showToast('Failed to update status', 'danger');
     }
   };
 

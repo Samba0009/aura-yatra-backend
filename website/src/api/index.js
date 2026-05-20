@@ -1,5 +1,5 @@
-// Use Android emulator host for local device testing
-const API_BASE_URL = 'http://10.0.2.2:5000/api';
+// API base URL: prefer VITE_API_BASE_URL when set for production, otherwise use Railway backend
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://aura-yatra-backend-production.up.railway.app/api';
 
 export const fetchTemples = async (city = '') => {
   const url = city ? `${API_BASE_URL}/temples?city=${city}` : `${API_BASE_URL}/temples`;
